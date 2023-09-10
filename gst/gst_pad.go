@@ -657,6 +657,16 @@ func (p *Pad) Push(buf *Buffer) FlowReturn {
 	return FlowReturn(C.gst_pad_push(p.Instance(), buf.Ref().Instance()))
 }
 
+func (a *Pad) PushBytes(buf []byte) FlowReturn {
+	b := C.CBytes(buf)
+	defer C.free(b)
+
+	p := C.g_memdup2((C.gconstpointer)(b), C.ulong(len(buf)))
+	buffer := C.gst_buffer_new_wrapped(p, C.ulong(len(buf)))
+
+	return FlowReturn(C.gst_pad_push(a.Instance(), buffer))
+}
+
 // PushEvent sends the event to the peer of the given pad. This function is mainly used by elements to send events to their peer elements.
 //
 // This function takes ownership of the provided event so you should Ref it if you want to reuse the event after this call.
