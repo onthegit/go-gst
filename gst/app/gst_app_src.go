@@ -131,6 +131,17 @@ func (a *Source) PushBuffer(buf *gst.Buffer) gst.FlowReturn {
 	return gst.FlowReturn(ret)
 }
 
+func (a *Source) PushBytes(buf []byte) gst.FlowReturn {
+	b := C.CBytes(buf)
+	defer C.free(b)
+
+	bfd := C.gst_buffer_new_wrapped(C.g_memdup2((C.gconstpointer)(b), C.ulong(len(buf))), C.ulong(len(buf)))
+
+	return gst.FlowReturn(C.gst_app_src_push_buffer(
+		(*C.GstAppSrc)(a.Instance()),
+		bfd))
+}
+
 // PushBufferList adds a buffer list to the queue of buffers and buffer lists that the appsrc element will push
 // to its source pad. This function takes ownership of buffer_list.
 //
