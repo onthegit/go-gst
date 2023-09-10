@@ -18,6 +18,7 @@ gboolean  cgoSeekDataCb   (GstAppSrc *src, guint64 offset, gpointer user_data) {
 */
 import "C"
 import (
+	"runtime"
 	"unsafe"
 
 	"github.com/go-gst/go-gst/gst"
@@ -135,8 +136,12 @@ func (a *Source) PushBytes(buf []byte) gst.FlowReturn {
 	b := C.CBytes(buf)
 	defer C.free(b)
 
-	p := C.g_memdup((C.gconstpointer)(b), C.uint(len(buf)))
+	p := C.g_memdup2((C.gconstpointer)(b), C.ulong(len(buf)))
 	buffer := C.gst_buffer_new_wrapped(p, C.ulong(len(buf)))
+
+	runtime.SetFinalizer(buffer, func(buf *C.GstBuffer) {
+		C.gst_buffer_unref(buf)
+	})
 
 	return gst.FlowReturn(C.gst_app_src_push_buffer((*C.GstAppSrc)(a.Instance()), buffer))
 }
