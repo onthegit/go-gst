@@ -58,7 +58,7 @@ func FromGstBufferUnsafeFull(buf unsafe.Pointer) *Buffer {
 	}
 
 	wrapped := ToGstBuffer(buf)
-	runtime.SetFinalizer(wrapped, (*Buffer).Unref)
+	// runtime.SetFinalizer(wrapped, (*Buffer).Unref)
 	return wrapped
 }
 
