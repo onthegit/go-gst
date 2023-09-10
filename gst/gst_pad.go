@@ -662,13 +662,11 @@ func (p *Pad) Push(buf *Buffer) FlowReturn {
 // This function will call installed block probes before triggering any installed data probes.
 //
 // The function proceeds calling Chain on the peer pad and returns the value from that function. If pad has no peer, GST_FLOW_NOT_LINKED will be returned.
-func (a *Pad) PushBytes(buf []byte) FlowReturn {
+func (p *Pad) PushBytes(buf []byte) FlowReturn {
 	b := C.CBytes(buf)
 	defer C.free(b)
 
-	p := C.g_memdup2((C.gconstpointer)(b), C.ulong(len(buf)))
-
-	return FlowReturn(C.gst_pad_push(a.Instance(), C.gst_buffer_new_wrapped(p, C.ulong(len(buf)))))
+	return FlowReturn(C.gst_pad_push(p.Instance(), C.gst_buffer_new_wrapped(C.g_memdup2((C.gconstpointer)(b), C.ulong(len(buf))), C.ulong(len(buf)))))
 }
 
 // PushEvent sends the event to the peer of the given pad. This function is mainly used by elements to send events to their peer elements.
