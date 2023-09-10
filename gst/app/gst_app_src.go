@@ -126,7 +126,7 @@ func (a *Source) GetStreamType() StreamType {
 func (a *Source) PushBuffer(buf *gst.Buffer) gst.FlowReturn {
 	ret := C.gst_app_src_push_buffer(
 		(*C.GstAppSrc)(a.Instance()),
-		(*C.GstBuffer)(unsafe.Pointer(buf.Ref().Instance())),
+		(*C.GstBuffer)(unsafe.Pointer(buf.Instance())),
 	)
 	return gst.FlowReturn(ret)
 }
